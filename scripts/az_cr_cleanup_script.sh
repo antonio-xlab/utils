@@ -6,7 +6,9 @@
 #
 # USAGE
 # Format: sh az_cr_cleanup_script.sh <ARG_DRY_RUN> <ARG_CONTAINER_REGISTRY_NAME> <ARG_KEEP_N_LATEST> <ARG_REPO_NAMES_OPTIONAL>
-# Examples: sh az_cr_cleanup_script.sh 1 moonstonedevacr 3
+#
+# Examples: 
+#			sh az_cr_cleanup_script.sh 1 moonstonedevacr 3
 #			sh az_cr_cleanup_script.sh 1 moonstonedevacr 3 borderforce,borderforce_webapp,borderforce_worker
 #			sh az_cr_cleanup_script.sh 0 moonstonedevacr 3
 #			sh az_cr_cleanup_script.sh 0 moonstonedevacr 3 labgnostic-processor,labgnostic-lab2lab
@@ -15,10 +17,10 @@
 DEFAULTIFS=$IFS
 
 # INPUTS
-dry_run=$1 				# 1 = dry run (doesn't delete any resources) | 0 = actual run (deletes Azure resources)
-registry_name=$2 		# e.g moonstonedevacr
-keep=$3 				# keep N latest images in a given repository
-repository_names=$4 	# comma separated list of repositories (by name) to run cleanup script in
+dry_run=$1 # 1 = dry run (doesn't delete any resources) | 0 = actual run (deletes Azure resources)
+registry_name=$2 # e.g moonstonedevacr
+keep=$3 # keep N latest images in a given repository
+repository_names=$4 # comma separated list of repositories (by name) to run cleanup script in
 
 # OUTPUTS
 deleted=0 # how many images have been purged by the end of the script
