@@ -5,7 +5,7 @@
 # Supports dry-runs (i.e no actual deletions of Azure resources is done).
 #
 # USAGE
-# Format: sh az_cr_cleanup_script.sh <ARG_DRY_RUN> <ARG_CONTAINER_REGISTRY_NAME> <ARG_KEEP_N_LATEST>
+# Format: sh az_cr_cleanup_script.sh <ARG_DRY_RUN> <ARG_CONTAINER_REGISTRY_NAME> <ARG_KEEP_N_LATEST> <ARG_REPO_NAMES_OPTIONAL>
 # Examples: sh az_cr_cleanup_script.sh 1 moonstonedevacr 3
 #			sh az_cr_cleanup_script.sh 1 moonstonedevacr 3 borderforce,borderforce_webapp,borderforce_worker
 #			sh az_cr_cleanup_script.sh 0 moonstonedevacr 3
@@ -15,10 +15,10 @@
 DEFAULTIFS=$IFS
 
 # INPUTS
-dry_run=$1 # 1 = dry run (doesn't delete any resources) | 0 = actual run (deletes Azure resources)
-registry_name=$2 # e.g moonstonedevacr
-keep=$3 # keep N latest images in a given repository
-repository_names=$4 # comma separated list of repositories (by name) to run cleanup script in
+dry_run=$1 				# 1 = dry run (doesn't delete any resources) | 0 = actual run (deletes Azure resources)
+registry_name=$2 		# e.g moonstonedevacr
+keep=$3 				# keep N latest images in a given repository
+repository_names=$4 	# comma separated list of repositories (by name) to run cleanup script in
 
 # OUTPUTS
 deleted=0 # how many images have been purged by the end of the script
@@ -38,10 +38,11 @@ else
 	echo "Note that this is not a dry-run and that image tags *will* be deleted."
 fi
 
-# Figure out whether to cleanup all repositories under registry or only given ones
+# Figure out whether to cleanup all repositories under the registry or only given ones
 if [ "$repository_names" == "" ] || [ "$repository_names" == " " ] || [ "$repository_names" == "\n" ]; then
 
 	# NO REPOSITORY NAMES PROVIDED, run in all repositories found under the given registry
+
 	echo "Querying the entire $registry_name registry."
 	repositories=$(az acr repository list --name $registry_name --output json | jq -r '.[]')
 
@@ -61,8 +62,7 @@ if [ "$repository_names" == "" ] || [ "$repository_names" == " " ] || [ "$reposi
 				echo "Image to delete: $repo:$tag"
 			else
 				# Actual deletion of tags from the given repo
-				echo "Not supported."
-				# az acr repository delete --name $registry_name --image $repo:$tag -y
+				az acr repository delete --name $registry_name --image $repo:$tag -y
 			fi
 
 			# Track number of deleted images, both globally and in the given repository
@@ -77,7 +77,9 @@ if [ "$repository_names" == "" ] || [ "$repository_names" == " " ] || [ "$reposi
 		fi
 	done
 else
-	# REPOSITORY NAMES PROVIDED, run only in the those ones
+
+	# REPOSITORY NAMES PROVIDED, run script only in the those ones
+
 	echo "Querying the given repositories under $registry_name."
 	IFS="," read -ra repositories <<< "$repository_names"
 	IFS=$DEFAULTIFS
@@ -100,8 +102,7 @@ else
 				echo "Image to delete: $repo:$tag"
 			else
 				# Actual deletion of tags from the given repo
-				echo "Not supported."
-				# az acr repository delete --name $registry_name --image $repo:$tag -y
+				az acr repository delete --name $registry_name --image $repo:$tag -y
 			fi
 
 			# Track number of deleted images, both globally and in the given repository
