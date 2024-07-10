@@ -5,10 +5,10 @@
 # Can be used in tandem with Octopus pipelines such that events are published when new code is deployed.
 #
 # USAGE
-# Format: sh publish_event_to_azappi.sh <I_KEY> <OWNER> <APP_NAME> <TENANT> <ENVIRONMENT>
+# Format: sh publish_event_to_azappi.sh <I_KEY> <OWNER> <APP_NAME> <TENANT> <ENVIRONMENT> <DEPLOYMENT_STATUS>
 #
 # Examples: 
-#			sh publish_event_to_azappi.sh "InstrumentationKey" "Antonio" "Gateway" "GBR" "Staging"
+#			sh publish_event_to_azappi.sh "InstrumentationKey" "Antonio" "Gateway" "GBR" "Staging" "Success"
 #
 
 azure_appi_endpoint="https://dc.services.visualstudio.com/v2/track"
@@ -20,11 +20,12 @@ owner=$2                    # who ran the deployment
 app_name=$3                 # the name of the app / service that was deployed
 tenant=$4                   # the tenant in which the deployment took place (e.g GBR, AUS, etc.)
 environment=$5              # the environment in which the deployment took place (e.g Staging)
+deploymentStatus=$6         # the status of the deployment (e.g success / fail)
 
 # ARG VALIDATION
-if [[ $# -lt 5 ]]; then
+if [[ $# -lt 6 ]]; then
 	echo "Example usage:"
-	echo "  sh publish_event_to_azappi.sh \"InstrumentationKey\" \"Antonio\" \"Gateway\" \"GBR\" \"Staging\""
+	echo "  sh publish_event_to_azappi.sh \"InstrumentationKey\" \"Antonio\" \"Gateway\" \"GBR\" \"Staging\" \"Success\""
 	exit 1
 fi
 
@@ -44,9 +45,10 @@ json_data=$(cat <<EOF
          "name": "$event_name",
          "properties": {
             "Owner": "$owner",
+            "AppName": "$app_name",
             "Tenant": "$tenant",
             "Environment": "$environment",
-            "AppName": "$app_name"
+            "DeploymentStatus": "$deploymentStatus"
          }
       }
    }
