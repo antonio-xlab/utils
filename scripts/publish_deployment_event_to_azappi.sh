@@ -29,6 +29,13 @@ if [[ $# -lt 6 ]]; then
 	exit 1
 fi
 
+# OUTPUT INPUTS FOR SANITY CHECKING
+echo "Owner=$owner"
+echo "AppName=$app_name"
+echo "Tenant=$tenant"
+echo "Environment=$environment"
+echo "DeploymentStatus=$deploymentStatus"
+
 now=$(date +%Y-%m-%dT%H:%M:%S%z) # current timestamp in ISO-8601 format to please the Azure overlords
 
 # Build the custom event JSON object from the given parameters
